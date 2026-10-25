@@ -55,7 +55,8 @@
       if (opts.returning) extra.Prefer = 'return=representation';
       if (opts.upsert) extra.Prefer = 'resolution=merge-duplicates' + (opts.returning ? ',return=representation' : '');
       return fetch(cfg.supabaseUrl + '/rest/v1/' + path, {
-        method: method, headers: authHeaders(extra), body: body === undefined ? undefined : JSON.stringify(body)
+        method: method, headers: authHeaders(extra), body: body === undefined ? undefined : JSON.stringify(body),
+        cache: 'no-store'   /* never serve a stale table from the browser cache after a save */
       });
     }
     return go().then(function (r) {

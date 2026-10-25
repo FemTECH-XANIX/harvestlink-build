@@ -295,9 +295,16 @@ th{color:var(--mute);font-weight:600}
     return S.loadAll().then(function (d) { D = d; setNote('ok', msg); view(); }).catch(function (e) { setNote('err', e.message); view(); });
   }
   function view() { D ? dashboardView() : signInView(); document.getElementById('out').hidden = !S.signedIn(); document.getElementById('who').textContent = S.signedIn() ? S.email() : ''; }
-  function run(form, p, okMsg) {
+  /* Put the saved row straight into D so it shows at once, then reload to pick up anything else. */
+  function merge(table, row, key) {
+    if (!table || !row || !D[table]) return;
+    key = key || 'id';
+    D[table] = D[table].filter(function (x) { return x[key] !== row[key]; }).concat([row]);
+  }
+  function run(form, p, okMsg, table, key) {
     busy(form, true);
-    p.then(function () { return reload(okMsg); }).catch(function (e) { setNote('err', e.message); view(); });
+    p.then(function (row) { merge(table, row, key); setNote('ok', okMsg); view(); return reload(okMsg); })
+      .catch(function (e) { setNote('err', e.message); view(); });
   }
 
   document.addEventListener('submit', function (ev) {
@@ -309,16 +316,16 @@ th{color:var(--mute);font-weight:600}
         .catch(function (e) { D = null; setNote('err', e.message); view(); });
     } else if (f.id === 'f-farmer') {
       if (!c('fconsent')) { setNote('err', 'Tick the box to confirm consent before saving.'); view(); return; }
-      run(f, S.addFarmer({ displayName: v('fd'), farm: v('ff'), town: v('ft'), region: v('fr'), fullName: v('fn'), phone: v('fp'), consent: true, consentNote: v('fcn') }, D.farmers), 'Farmer saved.');
+      run(f, S.addFarmer({ displayName: v('fd'), farm: v('ff'), town: v('ft'), region: v('fr'), fullName: v('fn'), phone: v('fp'), consent: true, consentNote: v('fcn') }, D.farmers), 'Farmer saved.', 'farmers');
     } else if (f.id === 'f-listing') {
-      run(f, S.addListing({ farmerId: v('lf'), variety: v('lv'), crates: v('lc'), price: v('lp'), ready: v('lr'), notes: v('ln'), postedBy: v('lb') }), 'Harvest posted.');
+      run(f, S.addListing({ farmerId: v('lf'), variety: v('lv'), crates: v('lc'), price: v('lp'), ready: v('lr'), notes: v('ln'), postedBy: v('lb') }), 'Harvest posted.', 'listings');
     } else if (f.id === 'f-buyer') {
       if (!c('bconsent')) { setNote('err', 'Tick the box to confirm consent before saving.'); view(); return; }
-      run(f, S.addBuyer({ kind: v('bk'), town: v('bt'), fullName: v('bn'), phone: v('bp'), consent: true, consentNote: v('bcn') }, D.buyers), 'Buyer saved.');
+      run(f, S.addBuyer({ kind: v('bk'), town: v('bt'), fullName: v('bn'), phone: v('bp'), consent: true, consentNote: v('bcn') }, D.buyers), 'Buyer saved.', 'buyers');
     } else if (f.id === 'f-answer') {
-      run(f, S.addResponse({ listingId: v('al'), buyerId: v('ab'), answer: v('aa'), crates: v('ac'), price: v('ap'), neededOn: v('ad'), reason: v('ar') }), 'Answer saved.');
+      run(f, S.addResponse({ listingId: v('al'), buyerId: v('ab'), answer: v('aa'), crates: v('ac'), price: v('ap'), neededOn: v('ad'), reason: v('ar') }), 'Answer saved.', 'responses');
     } else if (f.id === 'f-follow') {
-      run(f, S.saveFollowUp({ listingId: v('uf'), harvestedOn: v('uh'), onTime: v('uo'), daysOff: v('ud'), sold: v('us'), rejected: v('ur'), cheap: v('uc'), wouldUseAgain: v('uw'), changeWanted: v('ux') }), 'Follow-up saved.');
+      run(f, S.saveFollowUp({ listingId: v('uf'), harvestedOn: v('uh'), onTime: v('uo'), daysOff: v('ud'), sold: v('us'), rejected: v('ur'), cheap: v('uc'), wouldUseAgain: v('uw'), changeWanted: v('ux') }), 'Follow-up saved.', 'follow_ups', 'listing_id');
     }
   });
   document.addEventListener('click', function (ev) {
