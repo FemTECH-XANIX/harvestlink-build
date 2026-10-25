@@ -12,8 +12,11 @@
     version: 1,
     varieties: [
       { id: 'pectomech',  name: 'Pectomech' },
-      { id: 'power-rano', name: 'Power Rano' },
+      { id: 'tropimech',  name: 'Tropimech' },
       { id: 'roma',       name: 'Roma VF' },
+      { id: 'power-rano', name: 'Power Rano' },
+      { id: 'marglobe',   name: 'Marglobe' },
+      { id: 'cobra',      name: 'Cobra' },
       { id: 'local',      name: 'Local round' }
     ],
     farmers: [
