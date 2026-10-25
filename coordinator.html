@@ -246,7 +246,9 @@ th{color:var(--mute);font-weight:600}
         '<div><label for="us">Crates sold</label><input id="us" type="number" min="0"></div><div><label for="ur">Crates rejected</label><input id="ur" type="number" min="0"></div>' +
         '<div><label for="uc">Crates sold cheaply</label><input id="uc" type="number" min="0"></div></div>' +
         '<label for="uw">Would you use this again?</label><textarea id="uw" maxlength="500"></textarea><label for="ux">What would you change?</label><textarea id="ux" maxlength="500"></textarea>' +
-        '<p><button class="primary" type="submit">Save follow-up</button></p></form><p class="muted small">Saving again for the same harvest updates it.</p></div>';
+        '<p><button class="primary" type="submit">Save follow-up</button></p></form><p class="muted small">Saving again for the same harvest updates it.</p></div>' +
+        '<div class="card scroll"><h2>Follow-ups (' + D.follow_ups.length + ')</h2><table><tr><th>Harvest</th><th>Harvested on</th><th>On time</th><th>Days off</th><th>Sold</th><th>Rejected</th><th>Sold cheaply</th><th>Use again?</th><th>Change wanted</th></tr>' +
+        D.follow_ups.map(function (u) { var yn = u.on_time == null ? '' : u.on_time ? 'yes' : 'no'; return '<tr><td>' + esc(cf[u.listing_id]) + '</td><td>' + esc(u.harvested_on) + '</td><td>' + yn + '</td><td>' + esc(u.days_off) + '</td><td>' + esc(u.sold_crates) + '</td><td>' + esc(u.rejected_crates) + '</td><td>' + esc(u.cheap_crates) + '</td><td>' + esc(u.would_use_again) + '</td><td>' + esc(u.change_wanted) + '</td></tr>'; }).join('') + '</table></div>';
     }
     if (tab === 'requests') {
       var cq = listingCodes(), rq = D.enquiries.slice().sort(function (a, b) { return a.created_at < b.created_at ? 1 : -1; });
